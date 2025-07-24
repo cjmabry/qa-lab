@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Test Case: {{ testcase.title }}</h2>
+<p>{{ testcase.description }}</p>
+<h3>Step: {{ teststep.step_text }}</h3>
+{% if teststep.slug and environment and environment.url %}
+    {% set variables = {} %}
+    {% for var in environment.variables %}
+        {% set _ = variables.update({var.name: var.value}) %}
+    {% endfor %}
+    {% set rendered_slug = render_slug(teststep.slug, variables) %}
+    <a href="{{ environment.url ~ rendered_slug }}" target="_blank">
+        {{ environment.url ~ rendered_slug }}
+    </a>
+{% endif %}
+<p>Expected: {{ teststep.expected_result }}</p>
+<form method="POST">
+    <label>
+        <input type="radio" name="status" value="pass" required> Pass
+    </label>
+    <label>
+        <input type="radio" name="status" value="fail"> Fail
+    </label>
+    <label>
+        <input type="radio" name="status" value="skip"> Skip
+    </label>
+    <br>
+    <textarea name="notes" placeholder="Notes"></textarea>
+    <br>
+    <button type="submit">Next</button>
+</form>
+<p>Step {{ idx+1 }} of {{ total }}</p>
+{% endblock %}

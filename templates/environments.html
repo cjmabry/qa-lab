@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Environments</h1>
+<form method="POST">
+    <input type="text" name="title" placeholder="Title" required>
+    <br>
+    <input type="url" name="url" placeholder="Environment URL" required>
+    <br>
+    <textarea name="description" placeholder="Description"></textarea>
+    <br>
+    <button type="submit">Add Environment</button>
+</form>
+<ul>
+    {% for env in environments %}
+        <li>
+            <strong>{{ env.title }}</strong>:
+            <a href="{{ env.url }}" target="_blank">{{ env.url }}</a>
+            <br>
+            {{ env.description }}
+            <ul>
+                {% for var in env.variables %}
+                    <li>{{ var.name }}: {{ var.value }}</li>
+                {% endfor %}
+            </ul>
+            <form method="POST" action="{{ url_for('add_env_var', env_id=env.id) }}">
+                <input type="text" name="name" placeholder="Variable Name" required>
+                <input type="text" name="value" placeholder="Value" required>
+                <button type="submit">Add Variable</button>
+            </form>
+        </li>
+    {% endfor %}
+</ul>
+<a href="{{ url_for('home') }}">Back to Home</a>
+{% endblock %}

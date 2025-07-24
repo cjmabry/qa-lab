@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Test Cases</h1>
+    <a href="{{ url_for('runs') }}">View All Test Runs</a>
+    <a href="{{ url_for('environments') }}">Manage Environments</a>
+    <form method="POST">
+        <input type="text" name="title" placeholder="Title" required>
+        <br>
+        <textarea name="description" placeholder="Description"></textarea>
+        <br>
+        <br>
+        <button type="submit">Add Test Case</button>
+    </form>
+    <ul>
+        {% for case in test_cases %}
+            <li>
+                <strong>{{ case.title }}</strong>: {{ case.description }}
+
+                <!-- Delete Test Case Button -->
+                <form method="POST" action="{{ url_for('delete_case', case_id=case.id) }}" style="display:inline;">
+                    <button type="submit" onclick="return confirm('Delete this test case?')">Delete Case</button>
+                </form>
+                <ul>
+                    {% for step in case.steps %}
+                        <li>
+                            <b>Step:</b> {{ step.step_text }}<br>
+                            <b>Expected:</b> {{ step.expected_result }}<br>
+                            {% if step.slug and environments and environments[0].url %}
+                                {% set variables = {} %}
+                                {% for var in environments[0].variables %}
+                                    {% set _ = variables.update({var.name: var.value}) %}
+                                {% endfor %}
+                                {% set rendered_slug = render_slug(step.slug, variables) %}
+                                <a href="{{ environments[0].url ~ rendered_slug }}" target="_blank">
+                                    {{ environments[0].url ~ rendered_slug }}
+                                </a>
+                            {% endif %}
+                            <!-- Delete Step Button -->
+                            <form method="POST" action="{{ url_for('delete_step', step_id=step.id) }}" style="display:inline;">
+                                <button type="submit" onclick="return confirm('Delete this step?')">Delete Step</button>
+                            </form>
+                        </li>
+                    {% endfor %}
+                </ul>
+                <form method="POST" action="{{ url_for('add_step', testcase_id=case.id) }}">
+                    <input type="text" name="step_text" placeholder="Step description" required>
+                    <input type="text" name="slug" placeholder="Step Slug (e.g. /path/to/page)">
+                    <input type="text" name="expected_result" placeholder="Expected result">
+                    <button type="submit">Add Step</button>
+                </form>
+                <select id="var-insert-{{ case.id }}" onchange="insertVar('{{ case.id }}')">
+                    <option value="">Insert Variable</option>
+                    {% for var in environments[0].variables %}
+                        <option value="{{ var.name }}">{{ var.name }}</option>
+                    {% endfor %}
+                </select>
+                <script>
+                function insertVar(caseId) {
+                    var select = document.getElementById('var-insert-' + caseId);
+                    var slugInput = document.querySelector('form[action$="add_step/' + caseId + '"] input[name="slug"]');
+                    var varName = select.value;
+                    if (varName && slugInput) {
+                        var insertText = '+' + varName + '+';
+                        var start = slugInput.selectionStart;
+                        var end = slugInput.selectionEnd;
+                        slugInput.value = slugInput.value.substring(0, start) + insertText + slugInput.value.substring(end);
+                        slugInput.focus();
+                        slugInput.selectionStart = slugInput.selectionEnd = start + insertText.length;
+                        select.selectedIndex = 0;
+                    }
+                }
+                </script>
+            </li>
+        {% endfor %}
+    </ul>
+    <form method="POST" action="{{ url_for('start_run') }}">
+        <label for="environment_id">Environment:</label>
+        <select name="environment_id" id="environment_id" required>
+            {% for env in environments %}
+                <option value="{{ env.id }}">{{ env.title }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit">Start New Test Run</button>
+    </form>
+{% endblock %}

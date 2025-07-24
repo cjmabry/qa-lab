@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Test Runs</h1>
+<table border="1">
+    <tr>
+        <th>ID</th>
+        <th>Started At</th>
+        <th>Summary</th>
+    </tr>
+    {% for run in runs %}
+    <tr>
+        <td>{{ run.id }}</td>
+        <td>{{ run.started_at }}</td>
+        <td>
+            <a href="{{ url_for('run_summary', run_id=run.id) }}">View Summary</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+<a href="{{ url_for('home') }}">Back to Home</a>
+{% endblock %}

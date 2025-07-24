@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Test Run Summary</h2>
+<p>Started at: {{ testrun.started_at }}</p>
+<table border="1">
+    <tr>
+        <th>Test Case</th>
+        <th>Step</th>
+        <th>Expected</th>
+        <th>Status</th>
+        <th>Notes</th>
+    </tr>
+    {% for item in step_details %}
+    <tr>
+        <td>{{ item.testcase.title }}</td>
+        <td>{{ item.teststep.step_text }}</td>
+        <td>{{ item.teststep.expected_result }}</td>
+        <td>{{ item.status or '' }}</td>
+        <td>{{ item.notes or '' }}</td>
+    </tr>
+    {% endfor %}
+</table>
+<a href="{{ url_for('home') }}">Back to Home</a>
+{% endblock %}
