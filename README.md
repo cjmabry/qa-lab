@@ -1,4 +1,4 @@
-# QA Lab
+# QA Labs
 
 Quickly create and run test cases with dynamic data.
 
