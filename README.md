@@ -78,7 +78,7 @@ pytest
 All tests are located in the `tests` directory.
 
 ## TODO
-- [ ] Add ability to edit test cases
+- [x] Add ability to edit test cases
 - [ ] Add variable overrides on a per-run basis
 - [ ] Add support for data migrations once schema stabilizes
 - [ ] Explore rendering test step URLs on page in an iframe
