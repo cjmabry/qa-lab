@@ -16,6 +16,7 @@
         {% for case in test_cases %}
             <li>
                 <strong>{{ case.title }}</strong>: {{ case.description }}
+                <a href="{{ url_for('edit_case', case_id=case.id) }}">Edit</a>
 
                 <!-- Delete Test Case Button -->
                 <form method="POST" action="{{ url_for('delete_case', case_id=case.id) }}" style="display:inline;">
@@ -26,7 +27,7 @@
                         <li>
                             <b>Step:</b> {{ step.step_text }}<br>
                             <b>Expected:</b> {{ step.expected_result }}<br>
-                            {% if step.slug and environments and environments[0].url %}
+                            {% if step.slug and environments|length > 0 and environments[0].url %}
                                 {% set variables = {} %}
                                 {% for var in environments[0].variables %}
                                     {% set _ = variables.update({var.name: var.value}) %}
@@ -40,6 +41,7 @@
                             <form method="POST" action="{{ url_for('delete_step', step_id=step.id) }}" style="display:inline;">
                                 <button type="submit" onclick="return confirm('Delete this step?')">Delete Step</button>
                             </form>
+                            <a href="{{ url_for('edit_step', step_id=step.id) }}">Edit</a>
                         </li>
                     {% endfor %}
                 </ul>
@@ -49,12 +51,14 @@
                     <input type="text" name="expected_result" placeholder="Expected result">
                     <button type="submit">Add Step</button>
                 </form>
-                <select id="var-insert-{{ case.id }}" onchange="insertVar('{{ case.id }}')">
-                    <option value="">Insert Variable</option>
-                    {% for var in environments[0].variables %}
-                        <option value="{{ var.name }}">{{ var.name }}</option>
-                    {% endfor %}
-                </select>
+                {% if environments|length > 0 %}
+                    <select id="var-insert-{{ case.id }}" onchange="insertVar('{{ case.id }}')">
+                        <option value="">Insert Variable</option>
+                        {% for var in environments[0].variables %}
+                            <option value="{{ var.name }}">{{ var.name }}</option>
+                        {% endfor %}
+                    </select>
+                {% endif %}
                 <script>
                 function insertVar(caseId) {
                     var select = document.getElementById('var-insert-' + caseId);

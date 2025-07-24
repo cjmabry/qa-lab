@@ -220,6 +220,56 @@ def add_env_var(env_id):
     db.session.commit()
     return redirect(url_for('environments'))
 
+@app.route('/edit_case/<int:case_id>', methods=['GET', 'POST'])
+def edit_case(case_id):
+    case = TestCase.query.get_or_404(case_id)
+    if request.method == 'POST':
+        case.title = request.form['title']
+        case.description = request.form['description']
+        db.session.commit()
+        return redirect(url_for('home'))
+    return render_template('edit_case.html', case=case)
+
+@app.route('/edit_environment/<int:env_id>', methods=['GET', 'POST'])
+def edit_environment(env_id):
+    env = Environment.query.get_or_404(env_id)
+    if request.method == 'POST':
+        env.title = request.form['title']
+        env.url = request.form['url']
+        env.description = request.form['description']
+        db.session.commit()
+        return redirect(url_for('environments'))
+    return render_template('edit_environment.html', env=env)
+
+@app.route('/edit_step/<int:step_id>', methods=['GET', 'POST'])
+def edit_step(step_id):
+    step = TestStep.query.get_or_404(step_id)
+    if request.method == 'POST':
+        step.step_text = request.form['step_text']
+        step.slug = request.form['slug']
+        step.expected_result = request.form['expected_result']
+        db.session.commit()
+        return redirect(url_for('home'))
+    return render_template('edit_step.html', step=step)
+
+@app.route('/edit_env_var/<int:var_id>', methods=['GET', 'POST'])
+def edit_env_var(var_id):
+    var = EnvironmentVariable.query.get_or_404(var_id)
+    if request.method == 'POST':
+        var.name = request.form['name']
+        var.value = request.form['value']
+        db.session.commit()
+        return redirect(url_for('environments'))
+    return render_template('edit_env_var.html', var=var)
+
+@app.route('/delete_env_var/<int:var_id>', methods=['POST'])
+def delete_env_var(var_id):
+    var = EnvironmentVariable.query.get_or_404(var_id)
+    env_id = var.environment_id
+    db.session.delete(var)
+    db.session.commit()
+    return redirect(url_for('environments'))
+
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
